@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+<project name="Digital River ACME Storefront configuration App" default="build" basedir="../">
+	<!-- one back since we're in build/ -->
+
+	<!-- Load in Ant-Contrib to give us access to some very useful tasks! -->
+	<!-- the .jar file is located in the tools directory -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="../build/tools/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+
+	<!-- load property files -->
+	<property file="build/default.properties"/>
+	<property file="../build/default.properties"/>
+
+	<target name="clean" depends="-clean"/>
+
+	<target name="build"
+			  depends="	-intro,
+			  			-clean,
+						-copy,
+						-optimize,
+						-finish"/>
+						
+	<target name="-finish" description="(PRIVATE) Finish message">
+		<!-- This is a private target -->
+		<echo message="Finished building Config App!"/>
+	</target>
+
+  <target name="-copy" depends="-mkdirs">
+	<!-- This is a private target -->
+	<echo message="Copying over new files..."/>
+      <copy todir="./${dir.output}">
+          <fileset dir="${dir.project}/">
+          	<include name="img/*"/>
+          	<include name="index.html"/>
+          	<include name="js/require-jquery.js"/>
+          </fileset>
+    </copy>
+
+    <echo message="A copy of all new non-dev files are now in: ./${dir.output}."/>
+  </target>  
+
+	<target name="-clean" description="(PRIVATE) Wipe the previous build (Deletes the dir.publish directory">
+		<!-- This is a private target -->
+		<echo message="Cleaning up previous build directory..."/>
+		<delete dir="./${dir.output}/"/>
+	</target>				
+
+
+
+	<target name="-intro" description="(PRIVATE) Kindly inform the developer about the impending magic">
+		<!-- This is a private target -->
+
+		<echo message="====================================================================="/>
+		<echo message=" "/>      
+		<echo message="Building Digital River Storefront Configuration (mode: ${env})"/>
+		<echo message=" "/>
+		<echo message="====================================================================="/>
+		<echo message=" "/>
+		<echo message=" "/>
+
+	</target>
+
+	<target name="-mkdirs" depends="-clean">
+		<if>
+			<or>
+				<equals arg1="${dir.output}" arg2="."/>
+				<equals arg1="${dir.output}" arg2=".."/>
+				<equals arg1="${dir.output}" arg2="/"/>
+				<equals arg1="${dir.output}" arg2="./"/>
+				<equals arg1="${dir.output}" arg2="../"/>
+			</or>
+			<then>
+				<fail message="Your dir.output folder is set to ${dir.publish} which could delete your entire site or worse. Change it in project.properties"/>
+			</then>
+			<else>
+				<echo message="Creating directory structure... ${dir.output}"/>
+				<mkdir dir="${dir.output}"/>
+			</else>
+		</if>
+	</target>
+	
+	<target name="-call.r.js-java" description="(PRIVATE) Minifies the concatenated file using Java and Rhino">
+		<apply executable="java" parallel="false" verbose="true" failonerror="true" >
+			<fileset dir="${dir.build}" casesensitive="yes">
+				<include name="${requirejs.optimizer.settings}"/>        
+			</fileset>
+
+			<arg value="-Xss1m" />
+			<arg line="-classpath"/>
+			<arg value="./${dir.build.tools}/${rhino.jar};./${dir.build.tools}/${closure.jar}"/>
+			<arg value="org.mozilla.javascript.tools.shell.Main" />
+			<arg value="${dir.build.tools}/${r.js}"/>
+            <arg value="-o"/>
+ 		</apply>
+	</target>
+
+	<target name="-call.r.js" description="(PRIVATE) Minifies the concatenated file using NodeJS">
+		<apply executable="node" parallel="false" verbose="true" failonerror="true" >
+			<fileset dir="${dir.build}" casesensitive="yes">
+				<include name="${requirejs.optimizer.settings}"/>        
+			</fileset>
+			<arg value="${dir.build.tools}/${r.js}"/>
+            <arg value="-o"/>
+ 		</apply>
+	</target>
+
+	<target name="-optimize">
+    	<antcall target="-optimize.js" />
+    	<antcall target="-optimize.css" />
+    </target>
+    
+    <target name="-optimize.js">
+        <echo message="Combining and minifying JS files as AMD Module" />
+        <antcall target="-call.r.js">
+            <param name="requirejs.optimizer.settings" value="${file.js.build}" />
+        </antcall>  
+    </target>
+    
+    <target name="-optimize.css">
+        <echo message="Combining and minifying JS files as regular JS file" />
+        <antcall target="-call.r.js">
+            <param name="requirejs.optimizer.settings" value="${file.css.build}" />
+        </antcall>  
+    </target>
+</project>

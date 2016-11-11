@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<title>Untitled Document</title>
+		<!--<script src="libs/jquery.min.js"></script>-->
+		<script data-main="src/main" src="libs/require-jquery.js"></script>
+	</head>
+	
+	<body>
+		<input type="button" id="btnConnect" value="connect" />
+		<input type="button" id="btnLogin" value="login" />
+		<input type="button" id="btnLogout" value="logout"/>
+		<input type="button" id="btnDisconnect" value="disconnect" />
+		<input type="button" id="btnGetProducts" value="products.list" />
+		<input type="button" id="btnGetProduct" value="products.get" />
+		<input type="button" id="btnProductSearch" value="products.search" />
+		<input type="button" id="btnProductOffers" value="productOffers.list" />
+		<input type="button" id="btnGetProductOffer" value="productOffers.get" />
+		<input type="button" id="btnGetCategories" value="categories.list" />
+		<input type="button" id="btnGetCategory" value="categories.get" />
+		<input type="button" id="btnListByCategory" value="categories.listByCategory" />
+		<input type="button" id="btnAddLineItem" value="cart.addLineItem" />
+		<input type="button" id="btnViewCart" value="cart.get" />
+		<input type="button" id="btnRemoveLineItem" value="cart.removeLineItem" />
+		<input type="button" id="btnGetShopperInfo" value="shopper.get" />
+		<div>
+			<h3>Status</h3>
+			<p>Connected: <span id="connected"></span></p>
+			<p>Authenticated: <span id="auth"></span></p>
+			<p>Token: <span id="token"></span></p>
+		</div>
+		<div id="login" style="width: 600px; height:500px;"></div>
+	</body>
+</html>

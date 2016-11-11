@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+<project name="Digital River ACME Storefront" default="build" basedir="../">
+	<!-- one back since we're in build/ -->
+
+		<!-- load shell environment -->
+	<property environment="ENV" />
+
+	<!-- load property files -->
+	<property file="../build/default.properties"/>
+	<property file="build/default.properties"/>
+
+	<!-- Load in Ant-Contrib to give us access to some very useful tasks! -->
+	<!-- the .jar file is located in the tools directory -->
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${dir.build.tools}/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+
+	<target name="clean" depends="-clean"/>
+
+	<target name="build"
+			  depends="	-intro,
+			  			-clean,
+						-copy,
+						-finish"/>
+
+  <target name="-copy" depends="-mkdirs">
+  <!-- This is a private target -->
+
+      <echo message="Copying over new files..."/>
+      <copy todir="./${dir.output}">
+          <fileset dir="${dir.project}/" >
+          	<include name="**/*"/>
+          	<exclude name="**/${dir.output}/"/>
+			<exclude name="**/${dir.intermediate}/"/>
+			<exclude name="**/${dir.build}/"/>
+          	
+          </fileset>
+      </copy>
+
+      <echo message="A copy of all new non-dev files are now in: ./${dir.output}."/>
+  </target>  
+
+	<target name="-clean" description="(PRIVATE) Wipe the previous build (Deletes the dir.output directory">
+		<!-- This is a private target -->
+		<echo message="Cleaning up previous build directory..."/>
+		<delete dir="./${dir.intermediate}/"/>
+		<delete dir="./${dir.output}/"/>
+	</target>				
+
+	<target name="-finish" description="(PRIVATE) Wipe the previous build (Deletes the dir.intermediate directory)">
+		<!-- This is a private target -->
+		<delete dir="./${dir.intermediate}/"/>
+		<echo message="Finished building Storefront App!"/>
+	</target>
+
+	<target name="-intro" description="(PRIVATE) Kindly inform the developer about the impending magic">
+		<!-- This is a private target -->
+
+		<echo message="====================================================================="/>
+		<echo message=" "/>      
+		<echo message="Building Digital River ACME Storefront (mode: ${env})"/>
+		<echo message=" "/>
+		<echo message="====================================================================="/>
+		<echo message=" "/>
+		<echo message=" "/>
+
+	</target>
+
+	<target name="-mkdirs" depends="-clean">
+		<if>
+			<or>
+				<equals arg1="${dir.output}" arg2="."/>
+				<equals arg1="${dir.output}" arg2=".."/>
+				<equals arg1="${dir.output}" arg2="/"/>
+				<equals arg1="${dir.output}" arg2="./"/>
+				<equals arg1="${dir.output}" arg2="../"/>
+			</or>
+			<then>
+				<fail message="Your dir.output folder is set to ${dir.output} which could delete your entire site or worse. Change it in project.properties"/>
+			</then>
+			<else>
+				<echo message="Creating directory structure... ${dir.output}"/>
+				
+				<mkdir dir="${dir.intermediate}"/>
+				
+				<copy todir="${dir.intermediate}" includeEmptyDirs="true">
+					<fileset dir="${dir.project}/" excludes="${file.default.exclude}, ${file.exclude}">
+						<type type="dir"/>
+					</fileset>
+				</copy>
+				
+				<mkdir dir="${dir.output}"/>
+			</else>
+		</if>
+	</target>
+</project>
